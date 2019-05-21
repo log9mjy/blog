@@ -1,7 +1,7 @@
 ---
 title: spring-cloud之config
 date: 2019-05-18 16:28:01
-tags:[config]
+tags: config配置
 ---
 
 ##  简介
