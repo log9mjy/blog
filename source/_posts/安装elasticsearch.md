@@ -34,6 +34,54 @@ type:index存储类型,6.x版本后只能有一种类型
 
 对于分布式搜索引擎来说, 分片及副本的分配将是高可用及快速搜索响应的设计核心.主分片与副本都能处理查询请求, 它们的唯一区别在于只有主分片才能处理索引请求.
 
+#### 安装KIbana
+
+https://www.elastic.co/guide/cn/kibana/current/windows.html
+
+#### 数据类型
+
+| 类型           | 表示的数据类型                         |
+| -------------- | -------------------------------------- |
+| String         | `string`                               |
+| Whole number   | `byte`, `short`, `integer`, `long`     |
+| Floating point | `float`, `double`                      |
+| Boolean        | `boolean`                              |
+| Date           | `date`                                 |
+| text           | text(用于分词,不能用于聚合)            |
+| keyword        | keyword(用于聚合以及排序,不能用于分词) |
+
+
+
+#### 查询版本
+
+```javascript
+GET  ?pretty
+```
+
+响应
+
+```
+{
+  "name": "node-06",
+  "cluster_name": "xb-application",
+  "cluster_uuid": "k4nebPYsTNeVHgZop-i4ig",
+  "version": {
+    "number": "6.3.0",
+    "build_flavor": "default",
+    "build_type": "tar",
+    "build_hash": "424e937",
+    "build_date": "2018-06-11T23:38:03.357887Z",
+    "build_snapshot": false,
+    "lucene_version": "7.3.1",
+    "minimum_wire_compatibility_version": "5.6.0",
+    "minimum_index_compatibility_version": "5.0.0"
+  },
+  "tagline": "You Know, for Search"
+}
+```
+
+
+
 #### 创建索引
 
 PUT请求  http://localhost:9200/accounts
@@ -48,6 +96,97 @@ PUT请求  http://localhost:9200/accounts
 ```
 
 #### 创建索引并映射
+
+映射字段
+
+```
+{
+　  "type" : "text", #是数据类型一般文本使用text(可分词进行模糊查询)；keyword无法被分词(不需要执行分词器)，用于精确查找
+
+    "analyzer" : "ik_max_word", #指定分词器，一般使用最大分词：ik_max_word
+    
+    "normalizer" : "normalizer_name", #字段标准化规则；如把所有字符转为小写；具体如下举例
+
+    "boost" : 1.5, #字段权重；用于查询时评分，关键字段的权重就会高一些，默认都是1；另外查询时可临时指定权重
+
+    "coerce" : true, #清理脏数据：1，字符串会被强制转换为整数 2，浮点数被强制转换为整数；默认为true
+
+    "copy_to" : "field_name", #自定_all字段；指定某几个字段拼接成自定义；具体如下举例
+
+    "doc_values" : true, #加快排序、聚合操作，但需要额外存储空间；默认true，对于确定不需要排序和聚合的字段可false
+
+    "dynamic" : true, #新字段动态添加 true:无限制 false:数据可写入但该字段不保留 'strict':无法写入抛异常
+
+    "enabled" : true, #是否会被索引，但都会存储;可以针对一整个_doc
+
+    "fielddata" : false, #针对text字段加快排序和聚合（doc_values对text无效）；此项官网建议不开启，非常消耗内存
+
+    "eager_global_ordinals": true, #是否开启全局预加载,加快查询；此参数只支持text和keyword，keyword默认可用，而text需要设置fielddata属性
+    
+    "format" : "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis" ,#格式化 此参数代表可接受的时间格式 3种都接受
+
+    "ignore_above" : 100, #指定字段索引和存储的长度最大值，超过最大值的会被忽略
+
+    "ignore_malformed" : false ,#插入文档时是否忽略类型 默认是false 类型不一致无法插入
+
+    "index_options" : "docs" ,
+    # 4个可选参数
+    # docs（索引文档号）,
+    # freqs（文档号 + 词频），
+    # positions（文档号 + 词频 + 位置，通常用来距离查询），
+    # offsets（文档号 + 词频 + 位置 + 偏移量，通常被使用在高亮字段）
+    # 分词字段默认是position，其他的默认是docs
+
+    "index" : true, #该字段是否会被索引和可查询 默认true
+
+    "fields": {"raw": {"type": "keyword"}} ,#可以对一个字段提供多种索引模式，使用text类型做全文检索，也可使用keyword类型做聚合和排序
+
+    "norms" : true, #用于标准化文档，以便查询时计算文档的相关性。建议不开启
+
+    "null_value" : "NULL", #可以让值为null的字段显式的可索引、可搜索
+
+    "position_increment_gap" : 0 ,#词组查询时可以跨词查询 既可变为分词查询 默认100
+
+    "properties" : {}, #嵌套属性，例如该字段是音乐，音乐还有歌词，类型，歌手等属性
+
+    "search_analyzer" : "ik_max_word" ,#查询分词器;一般情况和analyzer对应
+    
+    "similarity" : "BM25",#用于指定文档评分模型，参数有三个：
+    # BM25 ：ES和Lucene默认的评分模型
+    # classic ：TF/IDF评分
+    # boolean：布尔模型评分
+
+    "store" : true, #默认情况false,其实并不是真没有存储，_source字段里会保存一份原始文档。
+    # 在某些情况下，store参数有意义，比如一个文档里面有title、date和超大的content字段，如果只想获取title和date
+
+    "term_vector" : "no" #默认不存储向量信息，
+    # 支持参数yes（term存储），
+    # with_positions（term + 位置）,
+    # with_offsets（term + 偏移量），
+    # with_positions_offsets(term + 位置 + 偏移量)
+    # 对快速高亮fast vector highlighter能提升性能，但开启又会加大索引体积，不适合大数据量用
+}
+```
+
+将text的字段排序或则聚合
+
+在映射时使用
+
+```javascript
+"fields": {
+            "raw": { 
+              "type":  "keyword"
+            }
+          }
+```
+
+排序时
+
+```javascript
+ "sort": {
+    "city.raw": "asc" 
+  },
+```
 
 类型上字段以及字段类型
 
@@ -80,6 +219,45 @@ PUT请求  http://localhost:9200/accounts
   }
 }
 ```
+
+#### 查询映射
+
+```
+GET /my_index/_mapping/my_type
+```
+
+```
+{
+   "library": {
+      "mappings": {
+         "books": {
+            "properties": {
+               "name": {
+                  "type": "string",
+                  "index": "not_analyzed"
+               },
+               "number": {
+                  "type": "object",
+                  "dynamic": "true"
+               },
+               "price": {
+                  "type": "double"
+               },
+               "publish_date": {
+                  "type": "date",
+                  "format": "dateOptionalTime"
+               },
+               "title": {
+                  "type": "string"
+               }
+            }
+         }
+      }
+   }
+}
+```
+
+
 
 #### 删除索引/或记录
 
@@ -149,6 +327,92 @@ GET /my_index/my_type/_search
             }
         }
     }
+```
+
+
+
+范围查询
+
+```java
+"query": {
+    "bool": {
+      
+    },
+    "range": {
+      "FIELD": {
+        "gte": 10,
+        "lte": 20
+      }
+    }
+  }
+```
+
+排序
+
+```javascript
+ "sort": [
+    {
+      "FIELD": {
+        "order": "desc"
+      }
+    }
+  ]
+```
+
+分页
+
+```javascript
+"from": 0,
+"size": 1
+```
+
+聚合
+
+每个activityBrandId的条数
+
+```javascript
+{
+  "aggs": {
+    "bids": {
+      "terms": {
+        "field": "activityBrandId" 
+      }
+    }
+  }
+}
+```
+
+```javascript
+"aggregations": {
+    "bids": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": [
+        {
+          "key": 0,
+          "doc_count": 670
+        },
+        {
+          "key": 1001,
+          "doc_count": 4
+        },
+        {
+          "key": 1002,
+          "doc_count": 4
+        },
+        {
+          "key": 1000,
+          "doc_count": 1
+        }
+      ]
+    }
+  }
+```
+
+只查询某字段
+
+```javascript
+"_source": "activityBrandId"
 ```
 
 
