@@ -103,11 +103,55 @@ PUT请求,需要带上id   localhost:9200/index名/type名/id
 
 POST请求 ,不需要带ID,系统自动分配ID   localhost:9200/index名/type名
 
-#### 查看记录
+#### 查询
 
 GET请求  /Index/Type/_search或者ID
 
-请求体可以跟查询条件
+```js
+GET /my_index/my_type/_search
+{
+  "query": {
+    "bool": {
+      "must":     { "match": { "title": "quick" }},
+      "must_not": { "match": { "title": "lazy"  }},
+      "should": [
+                  { "match": { "title": "brown" }},
+                  { "match": { "title": "dog"   }}
+      ]
+    }
+  }
+}
+```
+
+空值查询
+
+```javascript
+ "query": {
+        "bool": {
+            "must_not": {
+                "exists": {
+                    "field": "enttype_code"
+                }
+            }
+        }
+    }
+```
+
+非空查询
+
+```javascript
+ "query": {
+        "bool": {
+            "must": {
+                "exists": {
+                    "field": "enttype_code"
+                }
+            }
+        }
+    }
+```
+
+
 
 #### 测试分词器
 
