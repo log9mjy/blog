@@ -397,3 +397,20 @@ position:absolute;
 transform: translate(-50%, -50%);
 ```
 
+动态为对象的属性赋值
+
+```javascript
+var s={
+name:"张三"
+}
+s.age=18
+var p='sex'
+s[p]='男'
+最后s变为:
+s{
+name :"张三",
+age :18,
+sex :"男"
+}
+```
+
