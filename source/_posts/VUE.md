@@ -168,7 +168,11 @@ panelShow() {
 <dia-log v-model="disable" @getKuaidi="getKuaidi($event)"></dia-log>
 ```
 
-###### v-model等同于:value,@input等同于v-model
+#### v-model解释
+
+v-model等同于 在子组件 prop:['value'],以及发送一个方法 this.$emit('input', newValue)
+
+
 
 #### 5.路由:
 
@@ -244,6 +248,154 @@ var routes = [
 
 
 
+#### 6.执行子组件事件
+
+在父组件
+
+```
+<child ref="childRef"></child>
+this.$ref.childRef.childEvent();
+```
+
+在子组件
+
+```
+methods: {
+    childEvent(){
+        // xxxx
+    }
+
+}
+```
+
+#### 使用富文本
+
+```
+npm install @tinymce/tinymce-vue -S
+```
+
+```
+npm install tinymce -S 
+```
+
+tinymce提供了很多的语言包，这里我们下载[中文语言包](<https://www.tiny.cloud/get-tiny/language-packages/>)
+
+1、在`public`目录下新建`tinymce`，将上面下载的语言包解压到该目录
+2、在`node_modules`里面找到`tinymce`,将`skins`目录复制到`public/tinymce`里面
+
+最终形成以下目录形式：
+![img](https://img2018.cnblogs.com/blog/1249006/201904/1249006-20190415142353815-177141399.jpg)
+
+编写 tinymce-editor.vue 组件
+
+```javascript
+<template>
+  <div class="tinymce-editor">
+    <editor v-model="myValue"
+      :init="init"
+      :disabled="disabled"
+      @onClick="onClick">
+    </editor>
+  </div>
+</template>
+<script>
+import tinymce from 'tinymce/tinymce'
+import Editor from '@tinymce/tinymce-vue'
+import 'tinymce/themes/silver'
+// 编辑器插件plugins
+// 更多插件参考：https://www.tiny.cloud/docs/plugins/
+import 'tinymce/plugins/image'// 插入上传图片插件
+import 'tinymce/plugins/media'// 插入视频插件
+import 'tinymce/plugins/table'// 插入表格插件
+import 'tinymce/plugins/lists'// 列表插件
+import 'tinymce/plugins/wordcount'// 字数统计插件
+export default {
+  components: {
+    Editor
+  },
+  props: {
+    value: {
+      type: String,
+      default: ''
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    plugins: {
+      type: [String, Array],
+      default: 'lists image media table wordcount'
+    },
+    toolbar: {
+      type: [String, Array],
+      default: 'undo redo |  formatselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | lists image media table | removeformat'
+    }
+  },
+  data () {
+    return {
+      init: {
+        language_url: '/tinymce/langs/zh_CN.js',
+        language: 'zh_CN',
+        skin_url: '/tinymce/skins/ui/oxide',
+        // skin_url: '/tinymce/skins/ui/oxide-dark',//暗色系
+        height: 300,
+        plugins: this.plugins,
+        toolbar: this.toolbar,
+        branding: false,
+        menubar: false,
+        // 此处为图片上传处理函数，这个直接用了base64的图片形式上传图片，
+        // 如需ajax上传可参考https://www.tiny.cloud/docs/configure/file-image-upload/#images_upload_handler
+        images_upload_handler: (blobInfo, success, failure) => {
+          const img = 'data:image/jpeg;base64,' + blobInfo.base64()
+          success(img)
+        }
+      },
+      myValue: this.value
+    }
+  },
+  mounted () {
+    tinymce.init({})
+  },
+  methods: {
+    // 添加相关的事件，可用的事件参照文档=> https://github.com/tinymce/tinymce-vue => All available events
+    // 需要什么事件可以自己增加
+    onClick (e) {
+      this.$emit('onClick', e, tinymce)
+    },
+    // 可以添加一些自己的自定义事件，如清空内容
+    clear () {
+      this.myValue = ''
+    }
+  },
+  watch: {
+    value (newValue) {
+      this.myValue = newValue
+    },
+    myValue (newValue) {
+      this.$emit('input', newValue)
+    }
+  }
+}
+
+</script>
+```
+
+使用
+
+```
+import TinymceEditor from '@/components/tinymce'
+
+components: {
+
+ TinymceEditor
+
+  },
+
+<TinymceEditor v-model="msg"></TinymceEditor>
+```
+
+
+
 #### 使用element-ui
 
 ```
@@ -268,6 +420,16 @@ var routes = [
    import 'element-ui/lib/theme-chalk/index.css'
    Vue.use(ElementUI)
 ```
+
+在使用上传文件时,在钩子函数需要传另外的参数
+
+```
+:on-success="(response, file, fileList)=>uploadSuccessPic(response, file, fileList,index,index2)"
+
+on-remove="(file, fileList)=>removePic(file, fileList,index,index2)"
+```
+
+
 
 #### 使用axios
 
