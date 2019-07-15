@@ -205,3 +205,29 @@ scroll-view,需放到一个view中,不单独使用,
 flex-shrink:0;
 ```
 
+##### 实现弹框的动画
+
+
+
+```
+隐藏前{
+transition: all 0.3s ease;
+transform: translateY(100%);
+}
+显示{
+transform: translateY(0);
+}
+```
+
+
+
+##### 实现返回列表页面
+
+在收货地址的时候.编辑后返回地址列表,应使用返回,而不是用挑转
+
+```
+uni.navigateBack({
+				delta:1
+				})
+```
+

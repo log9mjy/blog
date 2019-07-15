@@ -397,7 +397,7 @@ position:absolute;
 transform: translate(-50%, -50%);
 ```
 
-动态为对象的属性赋值
+#### 动态为对象的属性赋值
 
 ```javascript
 var s={
@@ -413,4 +413,5 @@ age :18,
 sex :"男"
 }
 ```
+
 
