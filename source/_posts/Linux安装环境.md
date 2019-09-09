@@ -203,6 +203,8 @@ chown -R es:es /usr/local/elasticserch-6.3.0
 su es
 
 ./elasticsearch
+
+后台启动 ./elasticsearch -d
 ```
 
 6.测试
