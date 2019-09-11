@@ -1,7 +1,8 @@
 ---
 title: Linux安装环境
 date: 2019-07-02 19:39:38
-tags: 安装环境
+tags: 
+categories: Linux
 ---
 
 ##  安装JDK
@@ -227,5 +228,175 @@ elasticsearch.url: "http://192.168.192.128:9200"
 启动
 
 ./kibana
+```
+
+## 安装fastDFS
+
+```
+1.下载安装libfastcommon
+git clone https://github.com/happyfish100/libfastcommon.git
+cd libfastcommon/
+./make.sh
+./make.sh install
+2.下载安装fastdfs
+wget https://github.com/happyfish100/fastdfs/archive/V5.05.tar.gz
+tar -zxvf V5.05.tar.gz
+cd V5.05
+./make.sh
+./make.sh install
+执行安装后，默认会安装到/usr/bin中，并在/etc/fdfs中添加三个配置文件。
+3.修改配置文件
+将/etc/fdfs中三个文件的名字去掉sample.
+tracker.conf 中修改：
+base_path=/usr/lgip_fastdfs/fastdfs-tracker-log   #用于存放日志
+storage.conf 中修改：
+base_path=/usr/lgip_fastdfs/fastdfs-storage-log   #用于存放日志
+store_path0=/usr/lgip_fastdfs/fastdfs-file-save   #存放数据
+tracker_server=192.168.20.35:22122                #指定tracker服务器地址
+client.conf 中同样要修改：
+base_path=/usr/lgip_fastdfs/fastdfs-client-log    #用于存放日志。
+tracker_server=192.168.20.35:22122                #指定tracker服务器地址
+注：以上的base_path、store_path0的路径均需要进行手动创建。
+4.启动tracker和storage
+/usr/bin/fdfs_trackerd /etc/fdfs/tracker.conf  
+/usr/bin/fdfs_storaged /etc/fdfs/storage.conf 
+5.重启tracker和storage
+/usr/bin/fdfs_trackerd /etc/fdfs/tracker.conf  restart
+/usr/bin/fdfs_storaged /etc/fdfs/storage.conf  restart
+6.停止tracker和storage
+/usr/bin/fdfs_trackerd /etc/fdfs/tracker.conf  stop
+/usr/bin/fdfs_storaged /etc/fdfs/storage.conf  stop
+7.启动成功，测试服务是否正常运行：
+上传：/usr/bin/fdfs_upload_file /etc/fdfs/client.conf /usr/01.jpg
+下载：/usr/bin/fdfs_download_file /etc/fdfs/client.conf group1/M00/00/00/eSosZVfrMy2ADEcxAADS9IecoKQ527.jpg /usr/02.jpg
+删除：/usr/bin/fdfs_delete_file /etc/fdfs/client.conf group1/M00/00/00/eSosZVfrLr6AfbmDAADS9IecoKQ093.jpg
+8.在所有storage节点安装fastdfs-nginx-module
+tar -xzvf fastdfs-nginx-module_v1.16.tar.gz
+修改 fastdfs-nginx-module 的 config 配置文件
+cd fastdfs-nginx-module/src
+ vi config
+将
+CORE_INCS="$CORE_INCS /usr/local/include/fastdfs /usr/local/include/fastcommon/" 
+修改为:
+CORE_INCS="$CORE_INCS /usr/include/fastdfs /usr/include/fastcommon/"
+9.安装Nginx
+tar -zxvf nginx-1.10.0.tar.gz
+./configure --add-module=/usr/local/src/fastdfs-nginx-module/src &&make && make install
+
+该出的add-module为fastdfs-nginx-module路径
+10.复制fastdfs-nginx-module下的mod_fastdfs.conf到/etc/fdfs/
+cp /usr/local/src/fastdfs-nginx-module/src/mod_fastdfs.conf /etc/fdfs/
+修改配置文件
+vi /etc/fdfs/mod_fastdfs.conf
+     connect_timeout=10
+     base_path=/tmp
+     tracker_server=ip01:22122
+     storage_server_port=23000
+     group_name=group1
+     url_have_group_name = true
+     store_path0=/fastdfs/storage     //为上传数据的的路径,storage.conf 中的store_path0的路径
+11.复制 FastDFS 的部分配置文件到/etc/fdfs 目录
+cd /usr/local/src/FastDFS/conf
+cp http.conf mime.types /etc/fdfs/
+12.配置nginx
+user root
+
+worker_processes 1;
+
+events {
+
+    worker_connections 1024;
+
+}
+
+http {
+
+    include mime.types;
+
+    default_type application/octet-stream;
+
+    sendfile on;
+
+    keepalive_timeout 65;
+
+    server {
+
+        listen 8888;
+
+        server_name localhost;
+
+        location ~/group([0-9])/M00 {
+
+            ngx_fastdfs_module;
+
+        }
+
+        error_page 500 502 503 504 /50x.html;
+
+ 
+
+        location = /50x.html {
+
+            root html;
+
+        }
+
+    }
+
+}
+注意:
+ A、8888 端口值是要与/etc/fdfs/storage.conf 中的 http.server_port=8888 相对应, 因为 http.server_port 默认为 8888,如果想改成 80,则要对应修改过来。
+ B、Storage 对应有多个 group 的情况下,访问路径带 group 名,如/group1/M00/00/00/xxx, 对应的 Nginx 配置为:
+     location ~/group([0-9])/M00 {
+         ngx_fastdfs_module;
+      }
+成功后:http://47.110.73.123:8888/group1/M00/00/00/rBCMX1v09E6AXJorAAB-mPrAqvM742.jpg
+```
+
+## 安装nginx
+
+```
+安装依赖
+yum install gcc
+yum install pcre-devel
+yum install zlib zlib-devel
+yum install openssl openssl-devel
+//一键安装上面四个依赖
+yum -y install gcc zlib zlib-devel pcre-devel openssl openssl-devel
+下载nginx的tar包
+复制代码
+//创建一个文件夹
+cd /usr/local
+mkdir nginx
+cd nginx
+//下载tar包
+wget http://nginx.org/download/nginx-1.13.7.tar.gz
+tar -xvf nginx-1.13.7.tar.gz
+复制代码
+安装nginx
+//进入nginx目录
+cd /usr/local/nginx
+//执行命令
+./configure
+//执行make命令
+make
+//执行make install命令
+make install
+Nginx常用命令
+//测试配置文件
+安装路径下的/nginx/sbin/nginx -t
+复制代码
+//启动命令
+安装路径下的/nginx/sbin/nginx
+//停止命令
+安装路径下的/nginx/sbin/nginx -s stop
+或者 : nginx -s quit
+//重启命令
+安装路径下的/nginx/sbin/nginx -s reload
+复制代码
+//查看进程命令
+ps -ef | grep nginx
+//平滑重启
+kill -HUP Nginx主进程号
 ```
 

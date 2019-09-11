@@ -1,7 +1,8 @@
 ---
 title: VUE的使用
 date: 2018-07-12 11:43:08
-tags: [前端]
+tags: 
+categories: 前端
 ---
 #### 1.创建项目:
 

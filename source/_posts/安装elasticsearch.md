@@ -1,7 +1,8 @@
 ---
 title: elasticsearch使用
 date: 2018-07-12 11:43:08
-tags: [搜索引擎]
+tags: 
+categories: 搜索引擎
 ---
 
 #### 安装elasticsearch

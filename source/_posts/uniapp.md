@@ -1,7 +1,8 @@
 ---
-title: uniapp的使用
+title: 学习前端的总结样式
 date: 2018-07-12 11:43:08
-tags: [前端]
+tags: 
+categories: 前端
 ---
 ##### 在app内通过浏览器打开网址
 

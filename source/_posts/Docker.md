@@ -1,7 +1,8 @@
 ---
 title: docker的安装使用
 date: 2018-10-12 11:43:08
-tags: [部署]
+tags: 
+categories: Docker
 ---
 
 # 1 Docker简介

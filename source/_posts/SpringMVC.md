@@ -1,7 +1,8 @@
 ---
-title: SpringMVC之Controller的全局控制
+title: springboot-Controller的全局控制
 date: 2018-07-12 11:43:08
-tags: [SpringMVC]
+tags: 
+categories: springboot
 ---
 #### SpringMVC之Controller的全局控制
 
