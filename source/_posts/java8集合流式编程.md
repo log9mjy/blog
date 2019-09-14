@@ -1,7 +1,8 @@
 ---
 title: java8集合流式编程
 date: 2018-07-12 11:43:08
-tags: [java8特性]
+tags: 
+categories: java8
 ---
 #### java8集合流式编程
 

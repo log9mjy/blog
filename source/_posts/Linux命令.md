@@ -1,7 +1,8 @@
 ---
 title: Linux命令
 date: 2019-06-03 10:25:02
-tags: [Linux,服务器]
+tags: 
+categories: Linux
 ---
 
 ```shell

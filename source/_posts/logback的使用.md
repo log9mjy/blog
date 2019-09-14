@@ -1,7 +1,8 @@
 ---
-title: logback的使用
+title: springboot-logback的使用
 date: 2019-05-18 11:01:40
-tags: [日志]
+tags: 
+categories: springboot
 ---
 
 Logback是由log4j创始人设计的一个开源日志组件。LogBack被分为3个组件，logback-core, logback-classic 和 logback-access。

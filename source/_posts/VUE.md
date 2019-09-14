@@ -1,7 +1,8 @@
 ---
 title: VUE的使用
 date: 2018-07-12 11:43:08
-tags: [前端]
+tags: 
+categories: 前端
 ---
 #### 1.创建项目:
 
@@ -576,6 +577,7 @@ sex :"男"
 }
 ```
 
+<<<<<<< HEAD
 #### 双向绑定的坑
 
 Vue 不能检测到对象属性的添加或删除。由于 Vue 会在初始化实例时对属性执行 getter/setter 转化过程，所以属性必须在 data 对象上存在才能让 Vue 转换它，这样才能让它是响应的。为对象在后面添加的属性不是响应的
@@ -598,4 +600,3 @@ display: -webkit-box;
 -webkit-line-clamp: 3;
 overflow: hidden;
 ```
-
