@@ -559,7 +559,7 @@ position:absolute;
 transform: translate(-50%, -50%);
 ```
 
-动态为对象的属性赋值
+#### 动态为对象的属性赋值
 
 ```javascript
 var s={
@@ -574,5 +574,28 @@ name :"张三",
 age :18,
 sex :"男"
 }
+```
+
+#### 双向绑定的坑
+
+Vue 不能检测到对象属性的添加或删除。由于 Vue 会在初始化实例时对属性执行 getter/setter 转化过程，所以属性必须在 data 对象上存在才能让 Vue 转换它，这样才能让它是响应的。为对象在后面添加的属性不是响应的
+
+#### 超出省略号
+
+单行
+
+```
+overflow: hidden;
+text-overflow:ellipsis;
+white-space: nowrap;
+```
+
+多行
+
+```
+display: -webkit-box;
+-webkit-box-orient: vertical;
+-webkit-line-clamp: 3;
+overflow: hidden;
 ```
 
