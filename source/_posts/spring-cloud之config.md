@@ -1,7 +1,8 @@
 ---
 title: spring-cloud之config
 date: 2019-05-18 16:28:01
-tags: config配置
+tags: 
+categories: springcloud
 
 ---
 
@@ -58,7 +59,7 @@ management.endpoints.web.exposure.include=*
 
 ```
 #native会默认去resource中去查找
-spring.profiles.active.native 
+spring.profiles.active=native 
 # 配置中心
 spring.cloud.config.server.native.search-locations =classpath:/config/
 ```
@@ -102,51 +103,22 @@ eureka.client.service-url.defaultZone=http://mjy:mjy@localhost:5761/eureka/
 spring.main.allow-bean-definition-overriding=true
 ```
 
-在bootstrap.properties中配置,必须先加载该文件 .然后回去config-server中去查找对应的配置文件.
+在bootstrap.properties中配置,必须先加载该文件 .然后会去config-server中去查找对应的配置文件.
 
 另外:在依赖中有start的依赖,一般不需要自己去配置了.
 
+## 刷新
 
+当我们改变配置文件时.希望项目中可以即使更新
 
-## 远程调用:使用openfeign客户端去掉用
+在controller上加上注解
 
-### 导入依赖
+@RefreshScope
 
-```Java
-<dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-openfeign</artifactId>
-</dependency>
-```
+手动刷新
 
-使用:
+http://localhost:5763/actuator/refresh
 
-```Java
-@EnableFeignClients(basePackages = {"com.example.mjyorder.service"})
-public class MjyOrderApplication {
+2.0之前是http://localhost:5763/refresh
 
-    public static void main(String[] args) {
-        SpringApplication.run(MjyOrderApplication.class, args);
-    }
-```
-
-```Java
-@FeignClient(value = "mjy-product",fallback = ProductHystrix.class)//服务ID,熔断对应的实现
-public interface ProductService {
-    /**
-     * 添加商品
-     * @param product 商品
-     */
-    @PostMapping(value = "/product/add") //请求方式,名称参数必须一致 ,参数加注解@RequestParam
-    ResultVO add(@RequestBody Product product);
-
-
-}
-```
-
-开启
-
-```Java
-# 熔断开启
-feign.hystrix.enabled=true
-```
+就会得到改变后的配置文件
