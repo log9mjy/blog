@@ -5,6 +5,8 @@ tags:
 categories: http请求
 ---
 
+# OKHTTP
+
 ## I.简介
 
 HTTP是现代应用常用的一种交换数据和媒体的网络方式，高效地使用HTTP能让资源加载更快，节省带宽。OkHttp是一个高效的HTTP客户端，它有以下默认特性：
@@ -397,4 +399,6 @@ Okhttp默认情况下使用的是系统
 ```
 
 1. 每一个Call（其实现是RealCall）只能执行一次，否则会报异常，具体参见 `RealCall#execute()`
+
+# RestTemplate
 

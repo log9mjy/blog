@@ -465,7 +465,22 @@ post_tags:后标签
 只查询某字段
 
 ```javascript
-"_source": "activityBrandId"
+"_source": ["activityBrandId",""]
+```
+
+聚合查询
+
+```js
+{
+  "size": 0,不包含数据,只包含聚合相关
+  "aggs": {
+    "别名": {
+      "min(最小值)": {
+        "field": "字段"
+      }
+    }
+  }
+}
 ```
 
 
@@ -651,7 +666,7 @@ public interface GoodsRepository extends ElasticsearchRepository<Goods,Integer> 
 }
 ```
 
-**CRUD操作**
+###### CRUD操作
 
 ```
 <S extends T> S save(S var1);
@@ -708,7 +723,7 @@ False							findByAvailableFalse
 OrderBy							findByAvailableTrueOrderByNameDesc
 ```
 
-**条件查询**
+###### 条件查询
 
 ```
 <S extends T> S index(S var1);
@@ -796,7 +811,7 @@ queryBuilder.withSort(SortBuilders.fieldSort("stock").order(SortOrder.ASC));
 Page<Goods> search = goodsRepository.search(queryBuilder.build());
 ```
 
-高亮查询
+###### 高亮查询
 
 默认的DefaultResultMapper不支持高亮展示
 
@@ -1054,3 +1069,25 @@ AggregatedPage<BookIndex> bookIndices = elasticsearchTemplate.queryForPage(searc
 bookIndices.getContent().forEach(System.out::println);
 ```
 
+###### 聚合查询
+
+cs为别名
+
+minPrice为聚合字段
+
+查询query包含min,max,avg等
+
+```Java
+NativeSearchQueryBuilder searchQueryBuilder = new NativeSearchQueryBuilder();
+StatsAggregationBuilder statsAggregationBuilder =new StatsAggregationBuilder("cs");
+statsAggregationBuilder.field("minPrice");
+searchQueryBuilder.withIndices("xw_product")
+        .withTypes("type_product")
+        .addAggregation(statsAggregationBuilder);
+Aggregations query = elasticsearchTemplate.query(searchQueryBuilder.build(), new ResultsExtractor<Aggregations>() {
+    @Override
+    public Aggregations extract(SearchResponse searchResponse) {
+        return searchResponse.getAggregations();
+    }
+});
+```
