@@ -1,7 +1,8 @@
 ---
 title: spring-cloud之eureka配置
-date: 2019-05-18 14:01:12
-tags: [eureka]
+date: 2019-03-01 14:01:12
+tags: 
+categories: springcloud
 ---
 
 ## [SpringCloud Eureka参数配置项详解（转）](https://www.cnblogs.com/chry/p/7992885.html)

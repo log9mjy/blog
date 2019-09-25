@@ -1,6 +1,6 @@
 ---
 title: Linux命令
-date: 2019-06-03 10:25:02
+date: 2018-06-03 10:25:02
 tags: 
 categories: Linux
 ---

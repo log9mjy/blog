@@ -1,6 +1,6 @@
 ---
 title: spring-cloud之config
-date: 2019-05-18 16:28:01
+date: 2019-03-18 16:28:01
 tags: 
 categories: springcloud
 
@@ -122,3 +122,19 @@ http://localhost:5763/actuator/refresh
 2.0之前是http://localhost:5763/refresh
 
 就会得到改变后的配置文件
+
+## 消息总线
+
+- 1、提交代码触发post给客户端A发送bus/refresh
+- 2、客户端A接收到请求从Server端更新配置并且发送给Spring Cloud Bus
+- 3、Spring Cloud bus接到消息并通知给其它客户端
+- 4、其它客户端接收到通知，请求Server端获取最新配置
+- 5、全部客户端均获取到最新的配置
+
+```java
+<!--消息总线-->
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-bus-amqp</artifactId>
+</dependency>
+```
