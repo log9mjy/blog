@@ -125,7 +125,7 @@ busuanzi: true ## If you want to use Busuanzi page views please set the value to
 
 # About page
 about:
-  photo_url: https://gitee.com/log9mjy/static/raw/master/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20190514113539.jpg
+  photo_url: https://blog.moujiangyong.com/img/123.jpg
   items:
   - label: email
     url: log9mjy@163.com
